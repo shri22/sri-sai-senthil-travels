@@ -113,35 +113,44 @@ namespace S3T.Api.Controllers
 
             try
             {
-                // 2. Check availability again (Concurrency check)
-                var start = booking.TravelDate.Date;
-                var end = booking.EndDate?.Date ?? start;
-
-                var isBlocked = await _context.VehicleBlockedDates.AnyAsync(bd => 
-                    bd.VehicleId == booking.VehicleId && 
-                    bd.BlockedDate.Date >= start && bd.BlockedDate.Date <= end);
-
-                if (isBlocked)
+                // 2. Check availability only if VehicleId is provided
+                if (booking.VehicleId.HasValue && booking.VehicleId.Value > 0)
                 {
-                    return BadRequest(new { error = "Vehicle already reserved for one or more dates in this range." });
-                }
+                    var start = booking.TravelDate.Date;
+                    var end = booking.EndDate?.Date ?? start;
 
-                // 3. Save Booking
-                _context.Bookings.Add(booking);
-                await _context.SaveChangesAsync();
+                    var isBlocked = await _context.VehicleBlockedDates.AnyAsync(bd => 
+                        bd.VehicleId == booking.VehicleId.Value && 
+                        bd.BlockedDate.Date >= start && bd.BlockedDate.Date <= end);
 
-                // 4. Block the dates in range
-                for (var date = start; date <= end; date = date.AddDays(1))
-                {
-                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate
+                    if (isBlocked)
                     {
-                        VehicleId = booking.VehicleId,
-                        BlockedDate = date,
-                        BookingId = booking.Id,
-                        Reason = "Customer Booking"
-                    });
+                        return BadRequest(new { error = "Vehicle already reserved for one or more dates in this range." });
+                    }
+
+                    // 3. Save Booking
+                    _context.Bookings.Add(booking);
+                    await _context.SaveChangesAsync();
+
+                    // 4. Block the dates in range (only if vehicle is assigned)
+                    for (var date = start; date <= end; date = date.AddDays(1))
+                    {
+                        _context.VehicleBlockedDates.Add(new VehicleBlockedDate
+                        {
+                            VehicleId = booking.VehicleId.Value,
+                            BlockedDate = date,
+                            BookingId = booking.Id,
+                            Reason = "Customer Booking"
+                        });
+                    }
+                    await _context.SaveChangesAsync();
                 }
-                await _context.SaveChangesAsync();
+                else
+                {
+                    // No vehicle assigned yet - just save the booking
+                    _context.Bookings.Add(booking);
+                    await _context.SaveChangesAsync();
+                }
 
                 await transaction.CommitAsync();
 
@@ -271,6 +280,71 @@ namespace S3T.Api.Controllers
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null) return NotFound();
             return booking;
+        }
+
+        [HttpPut("{id}/assign-vehicle")]
+        public async Task<IActionResult> AssignVehicle(long id, [FromBody] AssignVehicleRequest request)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var booking = await _context.Bookings.FindAsync(id);
+                if (booking == null) return NotFound(new { error = "Booking not found" });
+
+                var start = booking.TravelDate.Date;
+                var end = booking.EndDate?.Date ?? start;
+
+                // Check if new vehicle is available
+                var isBlocked = await _context.VehicleBlockedDates.AnyAsync(bd => 
+                    bd.VehicleId == request.VehicleId && 
+                    bd.BlockedDate.Date >= start && bd.BlockedDate.Date <= end &&
+                    bd.BookingId != id); // Exclude current booking's blocks
+
+                if (isBlocked)
+                {
+                    return BadRequest(new { error = "Vehicle already reserved for one or more dates in this range." });
+                }
+
+                // Remove old vehicle blocks if vehicle was previously assigned
+                if (booking.VehicleId.HasValue)
+                {
+                    var oldBlocks = await _context.VehicleBlockedDates
+                        .Where(bd => bd.BookingId == id)
+                        .ToListAsync();
+                    _context.VehicleBlockedDates.RemoveRange(oldBlocks);
+                }
+
+                // Assign new vehicle
+                booking.VehicleId = request.VehicleId;
+
+                // Create new blocks for the assigned vehicle
+                for (var date = start; date <= end; date = date.AddDays(1))
+                {
+                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate
+                    {
+                        VehicleId = request.VehicleId,
+                        BlockedDate = date,
+                        BookingId = booking.Id,
+                        Reason = "Customer Booking"
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok(new { message = "Vehicle assigned successfully", booking });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { error = "Failed to assign vehicle", details = ex.Message });
+            }
+        }
+
+        public class AssignVehicleRequest
+        {
+            public int VehicleId { get; set; }
         }
 
         [HttpGet("{id}/invoice")]

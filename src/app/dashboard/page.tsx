@@ -335,6 +335,11 @@ export default function DashboardPage() {
                                             <div>
                                                 <h4 className="font-bold text-white">ID: {book.id}</h4>
                                                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{new Date(book.travelDate).toLocaleDateString()}</p>
+                                                {book.vehicleId ? (
+                                                    <p className="text-[9px] text-primary font-bold mt-1">🚐 {fleet.find(v => v.id === book.vehicleId)?.name || 'Vehicle Assigned'}</p>
+                                                ) : (
+                                                    <p className="text-[9px] text-yellow-500 font-bold mt-1">⚠️ No Vehicle Assigned</p>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="text-center">
@@ -359,8 +364,16 @@ export default function DashboardPage() {
                                                     className="opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-green-500 hover:text-black rounded-lg text-lg transition-all"
                                                     title="One-Click Share"
                                                 >
-                                                    �
+                                                    📱
                                                 </button>
+                                                {!book.vehicleId && (
+                                                    <button
+                                                        onClick={() => { setEditingBooking(book); setShowManualBookingForm(true); }}
+                                                        className="opacity-0 group-hover:opacity-100 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500 hover:text-black rounded-lg text-[9px] uppercase font-bold transition-all border border-yellow-500/30"
+                                                    >
+                                                        Assign
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => { setEditingBooking(book); setShowManualBookingForm(true); }}
                                                     className="opacity-0 group-hover:opacity-100 px-4 py-2 bg-white/10 hover:bg-blue-500 hover:text-white rounded-lg text-[9px] uppercase font-bold transition-all"
@@ -752,9 +765,9 @@ export default function DashboardPage() {
                                 {/* First Column */}
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Select Vehicle</label>
-                                        <select name="vehicleId" required defaultValue={editingBooking?.vehicleId || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none appearance-none cursor-pointer">
-                                            <option value="" className="bg-bg-dark">-- Choose Available Asset --</option>
+                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Select Vehicle (Optional)</label>
+                                        <select name="vehicleId" defaultValue={editingBooking?.vehicleId || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none appearance-none cursor-pointer">
+                                            <option value="" className="bg-bg-dark">-- Assign Later --</option>
                                             {fleet
                                                 .filter(v => availableIds === null || availableIds.includes(v.id) || v.id === editingBooking?.vehicleId)
                                                 .map(v => (
@@ -765,7 +778,7 @@ export default function DashboardPage() {
                                             }
                                         </select>
                                         {!manualDates.start && <p className="text-[8px] text-white/20 uppercase font-bold mt-1 italic">Enter dates first to see available vehicles.</p>}
-                                        {manualDates.start && availableIds?.length === 0 && <p className="text-[8px] text-red-500 uppercase font-bold mt-1 italic">No vehicles available for these dates.</p>}
+                                        {manualDates.start && availableIds?.length === 0 && <p className="text-[8px] text-yellow-500 uppercase font-bold mt-1 italic">No vehicles available - you can assign one later.</p>}
                                     </div>
 
                                     <div className="space-y-2">

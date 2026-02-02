@@ -655,9 +655,9 @@ export default function AdminDashboard() {
                                 }
                             }} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-2 sm:col-span-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Select Vehicle</label>
-                                    <select name="vehicleId" required defaultValue={editingBooking?.vehicleId} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none appearance-none cursor-pointer">
-                                        <option value="" className="bg-bg-dark">-- Choose Available Asset --</option>
+                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Select Vehicle (Optional)</label>
+                                    <select name="vehicleId" defaultValue={editingBooking?.vehicleId} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none appearance-none cursor-pointer">
+                                        <option value="" className="bg-bg-dark">-- Assign Later --</option>
                                         {fleet.map(v => (
                                             <option key={v.id} value={v.id} className="bg-bg-dark">
                                                 {v.name} ({v.number}) - {v.company}

@@ -66,7 +66,7 @@ namespace S3T.Api.Models
         public long Id { get; set; }
         public string? GroupBookingId { get; set; } // To link multiple buses in one trip
         
-        public int VehicleId { get; set; }
+        public int? VehicleId { get; set; } // Nullable - Vehicle can be assigned later
         public int? DriverId { get; set; }
         
         public string CustomerName { get; set; } = string.Empty;
