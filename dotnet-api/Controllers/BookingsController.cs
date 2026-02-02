@@ -473,12 +473,15 @@ namespace S3T.Api.Controllers
             if (booking == null || booking.Status != "Completed") 
                 return BadRequest(new { error = "Can only review completed trips." });
 
+            if (!booking.VehicleId.HasValue)
+                return BadRequest(new { error = "Cannot review a trip without an assigned vehicle." });
+
             booking.Rating = request.Rating;
             booking.Feedback = request.Comment;
 
             var review = new Review
             {
-                VehicleId = booking.VehicleId,
+                VehicleId = booking.VehicleId.Value,
                 CustomerName = booking.CustomerName,
                 Rating = request.Rating,
                 Comment = request.Comment
@@ -487,7 +490,7 @@ namespace S3T.Api.Controllers
             _context.Reviews.Add(review);
 
             // Update Vehicle Average Rating
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId.Value);
             if (vehicle != null)
             {
                 var allRatings = await _context.Reviews

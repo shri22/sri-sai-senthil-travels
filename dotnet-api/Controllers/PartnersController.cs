@@ -131,17 +131,20 @@ namespace S3T.Api.Controllers
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync(); // Save to get the ID
 
-            // Block dates for the range
-            var start = booking.TravelDate.Date;
-            var end = booking.EndDate?.Date ?? start;
-            for (var d = start; d <= end; d = d.AddDays(1))
+            // Block dates for the range only if vehicle is assigned
+            if (booking.VehicleId.HasValue)
             {
-                _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                    VehicleId = booking.VehicleId,
-                    BlockedDate = d,
-                    Reason = "Manual Reservation",
-                    BookingId = booking.Id
-                });
+                var start = booking.TravelDate.Date;
+                var end = booking.EndDate?.Date ?? start;
+                for (var d = start; d <= end; d = d.AddDays(1))
+                {
+                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                        VehicleId = booking.VehicleId.Value,
+                        BlockedDate = d,
+                        Reason = "Manual Reservation",
+                        BookingId = booking.Id
+                    });
+                }
             }
             
             await _context.SaveChangesAsync();
@@ -192,17 +195,20 @@ namespace S3T.Api.Controllers
                 booking.EndDate = updatedBooking.EndDate;
                 booking.VehicleId = updatedBooking.VehicleId;
 
-                // Add new blocks
-                var start = booking.TravelDate.Date;
-                var end = booking.EndDate?.Date ?? start;
-                for (var d = start; d <= end; d = d.AddDays(1))
+                // Add new blocks only if vehicle is assigned
+                if (booking.VehicleId.HasValue)
                 {
-                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                        VehicleId = booking.VehicleId,
-                        BlockedDate = d,
-                        Reason = "Manual Reservation Updated",
-                        BookingId = booking.Id
-                    });
+                    var start = booking.TravelDate.Date;
+                    var end = booking.EndDate?.Date ?? start;
+                    for (var d = start; d <= end; d = d.AddDays(1))
+                    {
+                        _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                            VehicleId = booking.VehicleId.Value,
+                            BlockedDate = d,
+                            Reason = "Manual Reservation Updated",
+                            BookingId = booking.Id
+                        });
+                    }
                 }
             }
 

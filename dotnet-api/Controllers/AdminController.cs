@@ -95,16 +95,20 @@ namespace S3T.Api.Controllers
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            var start = booking.TravelDate.Date;
-            var end = booking.EndDate?.Date ?? start;
-            for (var d = start; d <= end; d = d.AddDays(1))
+            // Block dates only if vehicle is assigned
+            if (booking.VehicleId.HasValue)
             {
-                _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                    VehicleId = booking.VehicleId,
-                    BlockedDate = d,
-                    Reason = "Admin Manual Entry",
-                    BookingId = booking.Id
-                });
+                var start = booking.TravelDate.Date;
+                var end = booking.EndDate?.Date ?? start;
+                for (var d = start; d <= end; d = d.AddDays(1))
+                {
+                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                        VehicleId = booking.VehicleId.Value,
+                        BlockedDate = d,
+                        Reason = "Admin Manual Entry",
+                        BookingId = booking.Id
+                    });
+                }
             }
             await _context.SaveChangesAsync();
             return Ok(booking);
