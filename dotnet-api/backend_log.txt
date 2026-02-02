@@ -1,0 +1,499 @@
+/Users/admin/.gemini/antigravity/scratch/sri-sai-senthil-travels/dotnet-api/S3T.Api.csproj : warning NU1701: Package 'Razorpay 3.1.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.
+/Users/admin/.gemini/antigravity/scratch/sri-sai-senthil-travels/dotnet-api/S3T.Api.csproj : warning NU1701: Package 'Razorpay 3.1.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = 'admin@s3t.com'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = 'partner@alpha.com'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (Size = 60)], CommandType='Text', CommandTimeout='30']
+      UPDATE "Users" SET "PasswordHash" = @p0
+      WHERE "Id" = @p1
+      RETURNING 1;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (Size = 60)], CommandType='Text', CommandTimeout='30']
+      UPDATE "Users" SET "PasswordHash" = @p0
+      WHERE "Id" = @p1
+      RETURNING 1;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Vehicles" AS "v")
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5000
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /Users/admin/.gemini/antigravity/scratch/sri-sai-senthil-travels/dotnet-api
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@__request_Email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 13)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__request_Email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+      INNER JOIN "Vehicles" AS "v" ON "b"."VehicleId" = "v"."Id"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__request_Email_0='?' (Size = 13)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Role" = 'Partner'
+      ORDER BY "u"."JoinedAt" DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Role" = 'Partner'
+      ORDER BY "u"."JoinedAt" DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 13)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__request_Email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+      INNER JOIN "Vehicles" AS "v" ON "b"."VehicleId" = "v"."Id"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0)
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0)
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime), @__ToLower_1='?' (Size = 3)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0) AND lower("v"."Type") = @__ToLower_1
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0)
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0)
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0)
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__travelDate_Value_Date_0='?' (DbType = DateTime), @__ToLower_1='?' (Size = 3)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type", "v1"."Id", "v1"."BlockedDate", "v1"."BookingId", "v1"."Reason", "v1"."VehicleId"
+      FROM "Vehicles" AS "v"
+      LEFT JOIN "VehicleBlockedDates" AS "v1" ON "v"."Id" = "v1"."VehicleId"
+      WHERE NOT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v0"
+          WHERE "v"."Id" = "v0"."VehicleId" AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v0"."BlockedDate", 'start of day'), '0'), '.') = @__travelDate_Value_Date_0) AND lower("v"."Type") = @__ToLower_1
+      ORDER BY "v"."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__booking_VehicleId_0='?' (DbType = Int32), @__booking_TravelDate_Date_1='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "VehicleBlockedDates" AS "v"
+          WHERE "v"."VehicleId" = @__booking_VehicleId_0 AND rtrim(rtrim(strftime('%Y-%m-%d %H:%M:%f', "v"."BlockedDate", 'start of day'), '0'), '.') = @__booking_TravelDate_Date_1)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = DateTime), @p1='?' (DbType = DateTime), @p2='?' (DbType = Decimal), @p3='?' (DbType = DateTime), @p4='?' (DbType = DateTime), @p5='?' (DbType = Double), @p6='?' (DbType = Double), @p7='?' (Size = 17), @p8='?' (Size = 21), @p9='?', @p10='?' (Size = 7), @p11='?' (DbType = Int32), @p12='?' (DbType = Int32), @p13='?' (DbType = Int32), @p14='?', @p15='?' (DbType = DateTime), @p16='?', @p17='?' (Size = 8), @p18='?' (DbType = Int32), @p19='?' (DbType = Decimal), @p20='?' (DbType = Int32), @p21='?' (Size = 9), @p22='?' (DbType = Decimal), @p23='?' (DbType = DateTime), @p24='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Bookings" ("ActualEndTime", "ActualStartTime", "AdvancePaid", "CancellationDate", "CreatedAt", "CurrentLat", "CurrentLng", "CustomerEmail", "CustomerName", "CustomerPhone", "DestinationTo", "DistanceKm", "DriverId", "EndKms", "Feedback", "LastLocationUpdate", "PaymentId", "PickupFrom", "Rating", "RefundAmount", "StartKms", "Status", "TotalAmount", "TravelDate", "VehicleId")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = DateTime), @p1='?' (DbType = Int64), @p2='?' (Size = 16), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "VehicleBlockedDates" ("BlockedDate", "BookingId", "Reason", "VehicleId")
+      VALUES (@p0, @p1, @p2, @p3)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__p_0='?' (DbType = Int64)], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+      WHERE "b"."Id" = @__p_0
+      LIMIT 1
+/v1/orders
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__request_Email_0='?' (Size = 13)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Role" = 'Partner'
+      ORDER BY "u"."JoinedAt" DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Role" = 'Partner'
+      ORDER BY "u"."JoinedAt" DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+      Failed executing DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT ConfigKey, ConfigValue FROM SystemConfig
+fail: Microsoft.AspNetCore.Server.Kestrel[13]
+      Connection id "0HNJ1KQSCIQB9", Request id "0HNJ1KQSCIQB9:00000002": An unhandled exception was thrown by the application.
+      Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'no such table: SystemConfig'.
+         at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+         at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+         at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+         at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery()
+         at System.Data.Common.DbCommand.ExecuteNonQueryAsync(CancellationToken cancellationToken)
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+         at S3T.Api.Controllers.AdminController.GetConfig() in /Users/admin/.gemini/antigravity/scratch/sri-sai-senthil-travels/dotnet-api/Controllers/AdminController.cs:line 48
+         at lambda_method633(Closure, Object)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+      --- End of stack trace from previous location ---
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+         at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+         at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+         at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+      Failed executing DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT ConfigKey, ConfigValue FROM SystemConfig
+fail: Microsoft.AspNetCore.Server.Kestrel[13]
+      Connection id "0HNJ1KQSCIQB9", Request id "0HNJ1KQSCIQB9:00000003": An unhandled exception was thrown by the application.
+      Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'no such table: SystemConfig'.
+         at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+         at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+         at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+         at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery()
+         at System.Data.Common.DbCommand.ExecuteNonQueryAsync(CancellationToken cancellationToken)
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+         at S3T.Api.Controllers.AdminController.GetConfig() in /Users/admin/.gemini/antigravity/scratch/sri-sai-senthil-travels/dotnet-api/Controllers/AdminController.cs:line 48
+         at lambda_method633(Closure, Object)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+      --- End of stack trace from previous location ---
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+         at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+         at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+         at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 13)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__request_Email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__request_Email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__email_0='?' (Size = 17)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."DeviceToken", "u"."Email", "u"."JoinedAt", "u"."Name", "u"."PasswordHash", "u"."Phone", "u"."Role", "u"."Status"
+      FROM "Users" AS "u"
+      WHERE "u"."Email" = @__email_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+      INNER JOIN "Vehicles" AS "v" ON "b"."VehicleId" = "v"."Id"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "v"."Id", "v"."AverageRating", "v"."BasePrice", "v"."Capacity", "v"."Company", "v"."HasAc", "v"."ImageName", "v"."Name", "v"."Number", "v"."PricePerKm", "v"."Status", "v"."Terrain", "v"."Type"
+      FROM "Vehicles" AS "v"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__partnerName_0='?' (Size = 21)], CommandType='Text', CommandTimeout='30']
+      SELECT "b"."Id", "b"."ActualEndTime", "b"."ActualStartTime", "b"."AdvancePaid", "b"."CancellationDate", "b"."CreatedAt", "b"."CurrentLat", "b"."CurrentLng", "b"."CustomerEmail", "b"."CustomerName", "b"."CustomerPhone", "b"."DestinationTo", "b"."DistanceKm", "b"."DriverId", "b"."EndKms", "b"."Feedback", "b"."LastLocationUpdate", "b"."PaymentId", "b"."PickupFrom", "b"."Rating", "b"."RefundAmount", "b"."StartKms", "b"."Status", "b"."TotalAmount", "b"."TravelDate", "b"."VehicleId"
+      FROM "Bookings" AS "b"
+      INNER JOIN "Vehicles" AS "v" ON "b"."VehicleId" = "v"."Id"
+      WHERE "v"."Company" = @__partnerName_0
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
