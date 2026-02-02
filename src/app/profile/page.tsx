@@ -10,7 +10,7 @@ export default function ProfilePage() {
     const [bookings, setBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const API_URL = (typeof window !== 'undefined' && window.location.hostname !== 'localhost') ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -72,11 +72,55 @@ export default function ProfilePage() {
                         <h1 className="text-3xl md:text-4xl font-serif font-bold italic leading-tight">Your <span className="text-primary underline decoration-primary/20">Heritage Ledger</span></h1>
                         <p className="text-[9px] md:text-[10px] text-white/40 uppercase tracking-widest font-bold mt-2">Member since {new Date(user?.joinedAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
                     </div>
-                    <div className="text-left sm:text-right w-full sm:w-auto p-4 sm:p-0 bg-white/5 sm:bg-transparent rounded-2xl border border-white/5 sm:border-0">
-                        <p className="text-sm font-bold text-white">{user?.name}</p>
-                        <p className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{user?.email}</p>
+                    <div className="flex flex-col items-end gap-3 w-full sm:w-auto">
+                        <div className="text-left sm:text-right w-full sm:w-auto p-4 sm:p-0 bg-white/5 sm:bg-transparent rounded-2xl border border-white/5 sm:border-0">
+                            <p className="text-sm font-bold text-white">{user?.name}</p>
+                            <p className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{user?.email}</p>
+                            {user?.role === 'Partner' && <span className="text-[8px] bg-primary/20 text-primary px-2 py-1 rounded inline-block mt-2 font-bold uppercase tracking-widest">Partner Account</span>}
+                        </div>
+                        {user?.role === 'Partner' && (
+                            <Link href="/dashboard" className="w-full sm:w-auto px-6 py-3 bg-white/10 text-white rounded-xl text-[10px] uppercase font-bold tracking-widest hover:bg-white hover:text-black transition-all text-center border border-white/20">
+                                Open Partner Console
+                            </Link>
+                        )}
                     </div>
                 </header>
+
+                {user?.role === 'Partner' && (
+                    <section className="space-y-6">
+                        <div className="flex justify-between items-end">
+                            <h2 className="text-lg md:text-xl font-serif font-bold text-white/60">Company Profile</h2>
+                        </div>
+                        <div className="glass-dark p-8 rounded-[32px] border border-white/5">
+                            <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={async (e) => {
+                                e.preventDefault();
+                                const f = new FormData(e.target as HTMLFormElement);
+                                const token = localStorage.getItem('token');
+                                await fetch(`${API_URL}/account/update-profile`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                    body: JSON.stringify({
+                                        companyName: f.get('companyName'),
+                                        address: f.get('address')
+                                    })
+                                });
+                                alert("Profile Updated");
+                            }}>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest">Company Name</label>
+                                    <input name="companyName" defaultValue={user.companyName} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-primary outline-none" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest">Registered Address</label>
+                                    <input name="address" defaultValue={user.address} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-primary outline-none" />
+                                </div>
+                                <div className="md:col-span-2 text-right">
+                                    <button type="submit" className="px-6 py-3 bg-primary text-black rounded-xl text-[10px] uppercase font-bold tracking-widest hover:bg-white transition-all shadow-lg shadow-primary/20">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                )}
 
                 <section className="space-y-6 md:space-y-8">
                     <h2 className="text-lg md:text-xl font-serif font-bold text-white/60">Active Reservations</h2>

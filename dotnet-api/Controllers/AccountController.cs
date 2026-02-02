@@ -32,7 +32,32 @@ namespace S3T.Api.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null) return NotFound();
 
-            return Ok(new { user.Id, user.Email, user.Name, user.Role, user.JoinedAt, user.Phone });
+            return Ok(new { 
+                user.Id, 
+                user.Email, 
+                user.Name, 
+                user.Role, 
+                user.JoinedAt, 
+                user.Phone,
+                user.CompanyName,
+                user.Address
+            });
+        }
+
+        [HttpPut("update-profile")]
+        public async Task<ActionResult<object>> UpdateProfile(UpdateProfileRequest request)
+        {
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return NotFound();
+
+            if (!string.IsNullOrEmpty(request.CompanyName)) user.CompanyName = request.CompanyName;
+            if (!string.IsNullOrEmpty(request.Address)) user.Address = request.Address;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Profile updated successfully" });
         }
 
         [HttpPost("login")]
@@ -66,11 +91,18 @@ namespace S3T.Api.Controllers
             {
                 Email = request.Email,
                 Name = request.Name,
+                CompanyName = request.CompanyName, 
+                Address = request.Address,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 Role = request.Role ?? "Customer",
                 Phone = request.Phone,
                 Status = (request.Role == "Partner") ? "Pending" : "Active"
             };
+
+            // For partners, if Company Name is empty, fallback to Name
+            if (user.Role == "Partner" && string.IsNullOrEmpty(user.CompanyName)) {
+                user.CompanyName = user.Name; 
+            }
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -84,12 +116,17 @@ namespace S3T.Api.Controllers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "a_very_long_and_secure_secret_key_12345"));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // Important: For Partners, the 'Name' claim represents the Company/Agency Name usage in the system
+            var identityName = (user.Role == "Partner" && !string.IsNullOrEmpty(user.CompanyName)) 
+                ? user.CompanyName 
+                : user.Name;
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Name, identityName), 
                 new Claim(ClaimTypes.MobilePhone, user.Phone ?? "9443856913")
             };
 
@@ -108,8 +145,14 @@ namespace S3T.Api.Controllers
     public class RegisterRequest { 
         public string Email { get; set; } = string.Empty; 
         public string Name { get; set; } = string.Empty; 
+        public string CompanyName { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty; 
         public string? Role { get; set; }
         public string? Phone { get; set; }
+    }
+    public class UpdateProfileRequest {
+        public string? CompanyName { get; set; }
+        public string? Address { get; set; }
     }
 }

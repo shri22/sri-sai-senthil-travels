@@ -62,7 +62,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NextJsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Your frontend URL
+        policy.WithOrigins("http://localhost:3000", "https://srisaisenthiltravels.cloud") // Development and Production URLs
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

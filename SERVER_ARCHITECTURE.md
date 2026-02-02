@@ -193,7 +193,7 @@ pm2 startup
 #### Database 1: S3T_Production
 - **Application**: Sri Sai Senthil Travels
 - **Connection String**: `Server=localhost;Database=S3T_Production;User Id=sa;Password=VMurugan@2025#SQL;TrustServerCertificate=True;`
-- **Tables**: Users, Vehicles, Bookings, Drivers, Partners, SystemConfigs, etc.
+- **Tables**: Users, Vehicles, Bookings, Drivers, Partners, SystemConfigs, PaymentLogs, FuelLogs, Expenses, Reviews
 
 #### Database 2: VMuruganGoldTrading
 - **Application**: VMurugan Gold Trading

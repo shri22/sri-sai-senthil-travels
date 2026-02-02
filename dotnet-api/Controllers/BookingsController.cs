@@ -154,6 +154,117 @@ namespace S3T.Api.Controllers
             }
         }
 
+        [HttpGet("{id}/agreement")]
+        public async Task<IActionResult> DownloadAgreement(long id)
+        {
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            var pdf = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(40);
+                    
+                    var companyName = vehicle?.Company ?? "SRI SAI SENTHIL TRAVELS";
+                    if (companyName == "S3T") companyName = "SRI SAI SENTHIL TRAVELS";
+
+                    // Header with Branding
+                    page.Header().Row(row =>
+                    {
+                        row.RelativeItem().Column(col =>
+                        {
+                            col.Item().Text(companyName.ToUpper()).FontSize(22).ExtraBold().FontColor("#D4AF37");
+                            col.Item().Text(companyName == "SRI SAI SENTHIL TRAVELS" ? "Heritage & Premium Transport Services" : "Elite Heritage Partner").FontSize(9).SemiBold();
+                            col.Item().Text(companyName == "SRI SAI SENTHIL TRAVELS" ? "Shed No 4, Heritage Colony, Madurai - 625001" : "Heritage Managed Fleet").FontSize(8);
+                            col.Item().Text(companyName == "SRI SAI SENTHIL TRAVELS" ? "GSTIN: 33AAAAA0000A1Z5 | Phone: +91 94438 56913" : $"Heritage Booking ID: S3T-{booking.Id}").FontSize(8);
+                        });
+                        row.ConstantItem(100).AlignRight().Column(col => {
+                           col.Item().Padding(5).Border(1).BorderColor("#D4AF37").AlignCenter().Text("BOOKING AGREEMENT").FontSize(10).Bold();
+                           col.Item().PaddingTop(5).AlignRight().Text($"ID: S3T-{booking.Id}").FontSize(8);
+                           col.Item().AlignRight().Text($"{DateTime.Now:dd/MM/yyyy}").FontSize(8);
+                        });
+                    });
+
+                    page.Content().PaddingVertical(20).Column(col =>
+                    {
+                        // Booking Table
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+
+                            table.Cell().BorderBottom(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Padding(5).Column(c => {
+                                c.Item().Text("CLIENT DETAILS").FontSize(8).Bold().FontColor(QuestPDF.Helpers.Colors.Grey.Medium);
+                                c.Item().Text(booking.CustomerName).Bold();
+                                c.Item().Text(booking.CustomerPhone).FontSize(9);
+                                c.Item().Text(booking.CustomerAddress ?? "N/A").FontSize(8);
+                            });
+
+                            table.Cell().BorderBottom(1).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten2).Padding(5).Column(c => {
+                                c.Item().Text("VEHICLE & JOURNEY").FontSize(8).Bold().FontColor(QuestPDF.Helpers.Colors.Grey.Medium);
+                                c.Item().Text($"{vehicle?.Name} ({vehicle?.Number})").Bold();
+                                c.Item().Text($"From: {booking.PickupFrom}").FontSize(9);
+                                c.Item().Text($"To: {booking.DestinationTo}").FontSize(9);
+                            });
+
+                            table.Cell().Padding(5).Column(c => {
+                                c.Item().Text("TRIP SCHEDULE").FontSize(8).Bold().FontColor(QuestPDF.Helpers.Colors.Grey.Medium);
+                                c.Item().Text($"Start: {booking.TravelDate:dd MMM yyyy}").FontSize(9);
+                                c.Item().Text($"End: {booking.EndDate?.ToString("dd MMM yyyy") ?? "N/A"}").FontSize(9);
+                                c.Item().Text($"Duration: {booking.NumDays} Day(s)").FontSize(9);
+                            });
+
+                            table.Cell().Padding(5).Column(c => {
+                                c.Item().Text("FINANCIAL SUMMARY").FontSize(8).Bold().FontColor(QuestPDF.Helpers.Colors.Grey.Medium);
+                                c.Item().Text($"Total Package: ₹{booking.TotalAmount:N2}").Bold();
+                                c.Item().Text($"Advance Paid: ₹{booking.AdvancePaid:N2}").FontSize(9).FontColor(QuestPDF.Helpers.Colors.Green.Medium);
+                                c.Item().Text($"Balance Due: ₹{(booking.TotalAmount - booking.AdvancePaid):N2}").FontSize(10).Bold().FontColor(QuestPDF.Helpers.Colors.Red.Medium);
+                            });
+                        });
+
+                        // Terms and Conditions Section
+                        col.Item().PaddingTop(25).Column(c => {
+                            c.Item().Text("TERMS AND CONDITIONS (நிபந்தனைகள்)").FontSize(11).Bold().FontColor("#D4AF37");
+                            c.Item().PaddingTop(5).Text("1. Toll, Parking, State Permit, and Hill Station Entry charges are extra unless specified.").FontSize(8);
+                            c.Item().Text("2. Driver Bata is applicable for every calendar day or night stay as per current rates.").FontSize(8);
+                            c.Item().Text("3. The starting and ending KM will be calculated from our office/garage.").FontSize(8);
+                            c.Item().Text("4. Diesel rates are fixed based on current market prices. Significant hikes may reflect in final bill.").FontSize(8);
+                            c.Item().Text("5. Booking is confirmed only upon payment of 25% advance amount.").FontSize(8);
+                            c.Item().Text("6. Sri Sai Senthil Travels is not responsible for luggage loss or delay due to traffic/breakdowns.").FontSize(8);
+                        });
+
+                        // Signature Section
+                        col.Item().PaddingTop(40).Row(row => {
+                            row.RelativeItem().Column(c => {
+                                c.Item().BorderTop(1).PaddingTop(5).AlignCenter().Text("Customer Signature").FontSize(8);
+                            });
+                            row.ConstantItem(100);
+                            row.RelativeItem().Column(c => {
+                                c.Item().BorderTop(1).PaddingTop(5).AlignCenter().Text($"For {companyName}").FontSize(8);
+                            });
+                        });
+                    });
+
+                    page.Footer().Column(c => {
+                        c.Item().LineHorizontal(1).LineColor(QuestPDF.Helpers.Colors.Grey.Lighten2);
+                        c.Item().PaddingTop(5).AlignCenter().Text(x => {
+                            x.Span("This is a computer-generated document. No physical signature required.").FontSize(7).Italic();
+                        });
+                    });
+                });
+            }).GeneratePdf();
+
+            return File(pdf, "application/pdf", $"Agreement_S3T_{booking.Id}.pdf");
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Booking>> GetBooking(long id)
         {
@@ -178,12 +289,15 @@ namespace S3T.Api.Controllers
                 container.Page(page =>
                 {
                     page.Margin(50);
+                    var companyName = vehicle?.Company ?? "SRI SAI SENTHIL TRAVELS";
+                    if (companyName == "S3T") companyName = "SRI SAI SENTHIL TRAVELS";
+
                     page.Header().Row(row =>
                     {
                         row.RelativeItem().Column(col =>
                         {
-                            col.Item().Text("SRI SAI SENTHIL TRAVELS").FontSize(24).SemiBold().FontColor("#D4AF37");
-                            col.Item().Text("Heritage Transport Solutions Since 1987").FontSize(10).Italic();
+                            col.Item().Text(companyName.ToUpper()).FontSize(24).SemiBold().FontColor("#D4AF37");
+                            col.Item().Text(companyName == "SRI SAI SENTHIL TRAVELS" ? "Heritage Transport Solutions Since 1987" : "Heritage Managed Trip").FontSize(10).Italic();
                         });
                         row.RelativeItem().AlignRight().Column(col =>
                         {
@@ -242,7 +356,7 @@ namespace S3T.Api.Controllers
 
                     page.Footer().AlignCenter().Text(t =>
                     {
-                        t.Span("Thank you for choosing Sri Sai Senthil Travels. Have a safe heritage journey.").FontSize(10).Italic();
+                        t.Span($"Thank you for choosing {companyName}. Have a safe heritage journey.").FontSize(10).Italic();
                     });
                 });
             }).GeneratePdf();
@@ -327,6 +441,31 @@ namespace S3T.Api.Controllers
             await _context.SaveChangesAsync();
             
             return Ok(expense);
+        }
+
+        [HttpPost("{id}/payment")]
+        public async Task<IActionResult> AddPaymentLog(long id, [FromBody] PaymentLog payment)
+        {
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            payment.BookingId = id;
+            payment.PaymentDate = DateTime.UtcNow;
+            
+            // Add Payment Log
+            _context.PaymentLogs.Add(payment);
+            
+            // Update Total Advance Paid
+            booking.AdvancePaid += payment.Amount;
+            
+            // Check if fully paid
+            if (booking.AdvancePaid >= booking.TotalAmount)
+            {
+                booking.BalanceStatus = "Paid";
+            }
+            
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Payment recorded", newBalance = booking.BalanceAmount });
         }
     }
 

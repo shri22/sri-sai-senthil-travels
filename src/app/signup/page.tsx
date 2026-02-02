@@ -9,11 +9,18 @@ export default function SignupPage() {
     const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const initialRole = searchParams?.get('role') || 'Customer';
 
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        phone: '',
+        companyName: '',
+        address: ''
+    });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const API_URL = (typeof window !== 'undefined' && window.location.hostname !== 'localhost') ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +36,9 @@ export default function SignupPage() {
                     email: formData.email,
                     password: formData.password,
                     phone: formData.phone,
-                    role: initialRole
+                    role: initialRole,
+                    companyName: formData.companyName,
+                    address: formData.address
                 }),
             });
 
@@ -72,16 +81,46 @@ export default function SignupPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1.5 md:space-y-2">
                         <label className="text-[9px] md:text-[10px] text-primary font-bold uppercase ml-2 tracking-widest">
-                            {initialRole === 'Partner' ? 'Business / Agency Name' : 'Full Name'}
+                            {initialRole === 'Partner' ? 'Contact Person Name' : 'Full Name'}
                         </label>
                         <input
                             type="text" required
                             className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary focus:outline-none transition-all"
-                            placeholder={initialRole === 'Partner' ? "Heritage Travels Pvt Ltd" : "Aditya Verma"}
+                            placeholder={initialRole === 'Partner' ? "Aditya Verma" : "Aditya Verma"}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         />
                     </div>
+
+                    {initialRole === 'Partner' && (
+                        <>
+                            <div className="space-y-1.5 md:space-y-2">
+                                <label className="text-[9px] md:text-[10px] text-primary font-bold uppercase ml-2 tracking-widest">
+                                    Travel Agency / Company Name
+                                </label>
+                                <input
+                                    type="text" required
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary focus:outline-none transition-all"
+                                    placeholder="Heritage Travels Pvt Ltd"
+                                    value={formData.companyName}
+                                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-1.5 md:space-y-2">
+                                <label className="text-[9px] md:text-[10px] text-primary font-bold uppercase ml-2 tracking-widest">
+                                    Office Address
+                                </label>
+                                <input
+                                    type="text" required
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary focus:outline-none transition-all"
+                                    placeholder="123, Temple St, Madurai"
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                />
+                            </div>
+                        </>
+                    )}
+
                     <div className="space-y-1.5 md:space-y-2">
                         <label className="text-[9px] md:text-[10px] text-primary font-bold uppercase ml-2 tracking-widest">Work Email Address</label>
                         <input

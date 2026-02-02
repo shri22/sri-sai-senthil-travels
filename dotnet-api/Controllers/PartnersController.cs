@@ -31,7 +31,7 @@ namespace S3T.Api.Controllers
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
             return await _context.Vehicles
-                .Where(v => v.Company == partnerName)
+                .Where(v => v.Company == partnerName && !v.IsDeleted)
                 .ToListAsync();
         }
 
@@ -44,6 +44,7 @@ namespace S3T.Api.Controllers
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
             vehicle.Company = partnerName;
+            vehicle.IsDeleted = false; // Ensure it's active
             
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
@@ -61,11 +62,14 @@ namespace S3T.Api.Controllers
             // Technically: This is a 'Join' query. We look for bookings where 
             // the associated Vehicle belongs to this Partner.
             var bookings = await _context.Bookings
+                .Include(b => b.Payments)
+                .Include(b => b.FuelLogs)
+                .Include(b => b.Expenses)
                 .Join(_context.Vehicles, 
                     b => b.VehicleId, 
                     v => v.Id, 
                     (b, v) => new { b, v })
-                .Where(x => x.v.Company == partnerName)
+                .Where(x => x.v.Company == partnerName && !x.v.IsDeleted)
                 .Select(x => x.b)
                 .ToListAsync();
 
@@ -85,6 +89,7 @@ namespace S3T.Api.Controllers
 
             // Ensure company doesn't change
             vehicle.Company = partnerName;
+            vehicle.IsDeleted = existingVehicle.IsDeleted; // Preserve delete status if accidentally passed
             
             _context.Entry(existingVehicle).State = EntityState.Detached;
             _context.Entry(vehicle).State = EntityState.Modified;
@@ -102,7 +107,10 @@ namespace S3T.Api.Controllers
             if (vehicle == null || vehicle.Company != partnerName)
                 return Unauthorized(new { error = "You do not own this vehicle." });
 
-            _context.Vehicles.Remove(vehicle);
+            // Soft Delete
+            vehicle.IsDeleted = true;
+            vehicle.Status = "Inactive";
+            
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -140,48 +148,195 @@ namespace S3T.Api.Controllers
             return Ok(booking);
         }
 
+        [HttpPut("bookings/{id}")]
+        public async Task<IActionResult> UpdateBooking(long id, Booking updatedBooking)
+        {
+            var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
+
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            if (vehicle == null || vehicle.Company != partnerName)
+                return Unauthorized();
+
+            // Update allowed fields
+            booking.CustomerName = updatedBooking.CustomerName;
+            booking.CustomerPhone = updatedBooking.CustomerPhone;
+            booking.CustomerEmail = updatedBooking.CustomerEmail;
+            booking.CustomerAddress = updatedBooking.CustomerAddress;
+            booking.PickupFrom = updatedBooking.PickupFrom;
+            booking.DestinationTo = updatedBooking.DestinationTo;
+            booking.Places = updatedBooking.Places;
+            booking.NumDays = updatedBooking.NumDays;
+            booking.NumPassengers = updatedBooking.NumPassengers;
+            booking.BaseRentAmount = updatedBooking.BaseRentAmount;
+            booking.MountainRent = updatedBooking.MountainRent;
+            booking.DriverBatta = updatedBooking.DriverBatta;
+            booking.PermitCost = updatedBooking.PermitCost;
+            booking.TollCost = updatedBooking.TollCost;
+            booking.OtherExpenses = updatedBooking.OtherExpenses;
+            booking.DiscountAmount = updatedBooking.DiscountAmount;
+            booking.TotalAmount = updatedBooking.TotalAmount;
+            booking.Notes = updatedBooking.Notes;
+
+            // If Dates or Vehicle changed, we need to re-block
+            if (booking.TravelDate != updatedBooking.TravelDate || booking.EndDate != updatedBooking.EndDate || booking.VehicleId != updatedBooking.VehicleId)
+            {
+                // Remove old blocks
+                var oldBlocks = _context.VehicleBlockedDates.Where(b => b.BookingId == id);
+                _context.VehicleBlockedDates.RemoveRange(oldBlocks);
+
+                booking.TravelDate = updatedBooking.TravelDate;
+                booking.EndDate = updatedBooking.EndDate;
+                booking.VehicleId = updatedBooking.VehicleId;
+
+                // Add new blocks
+                var start = booking.TravelDate.Date;
+                var end = booking.EndDate?.Date ?? start;
+                for (var d = start; d <= end; d = d.AddDays(1))
+                {
+                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                        VehicleId = booking.VehicleId,
+                        BlockedDate = d,
+                        Reason = "Manual Reservation Updated",
+                        BookingId = booking.Id
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(booking);
+        }
+
+        [HttpPost("bookings/{id}/cancel")]
+        public async Task<IActionResult> CancelBooking(long id)
+        {
+            var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
+
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            if (vehicle == null || vehicle.Company != partnerName)
+                return Unauthorized();
+
+            booking.Status = "Cancelled";
+            booking.CancellationDate = DateTime.UtcNow;
+
+            // Remove blocks
+            var blocks = _context.VehicleBlockedDates.Where(b => b.BookingId == id);
+            _context.VehicleBlockedDates.RemoveRange(blocks);
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Booking cancelled successfully" });
+        }
+
+        [HttpPost("bookings/{id}/close")]
+        public async Task<IActionResult> CloseTrip(long id, [FromBody] CloseTripRequest request)
+        {
+            var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
+
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            if (vehicle == null || vehicle.Company != partnerName)
+                return Unauthorized();
+
+            booking.Status = "Completed";
+            booking.StartKms = request.StartKms;
+            booking.EndKms = request.EndKms;
+            booking.DistanceKm = request.EndKms - request.StartKms;
+            booking.ActualStartTime = request.StartTime;
+            booking.ActualEndTime = request.EndTime;
+
+            await _context.SaveChangesAsync();
+            return Ok(booking);
+        }
+
+        public class CloseTripRequest
+        {
+            public int StartKms { get; set; }
+            public int EndKms { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+        }
+
+        [HttpPost("fuel-log")]
+        public async Task<IActionResult> AddFuelLog(FuelLog log)
+        {
+            var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
+
+            // Verify booking belongs to partner's vehicle
+            var booking = await _context.Bookings.FindAsync(log.BookingId);
+            if (booking == null) return NotFound();
+            
+            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+            if (vehicle == null || vehicle.Company != partnerName) 
+                return Unauthorized(new { error = "Unauthorized access to this trip." });
+
+            log.TotalCost = log.Liters * log.CostPerLiter;
+            log.FilledAt = DateTime.UtcNow;
+            
+            _context.FuelLogs.Add(log);
+            await _context.SaveChangesAsync();
+            return Ok(log);
+        }
+
         [HttpGet("reports/profit-loss")]
         public async Task<ActionResult<object>> GetProfitLossReport()
         {
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
-            var dieselPriceStr = (await _context.SystemConfigs.FindAsync("DieselPrice"))?.Value ?? "95";
-            decimal dieselPrice = decimal.Parse(dieselPriceStr);
-
-            // Fetch bookings with their vehicles to get mileage
+            // Fetch bookings with their vehicles, fuel logs, and expenses
             var data = await _context.Bookings
                 .Include(b => b.Expenses)
+                .Include(b => b.FuelLogs)
                 .Join(_context.Vehicles, b => b.VehicleId, v => v.Id, (b, v) => new { b, v })
-                .Where(x => x.v.Company == partnerName) // Including all to show status
+                .Where(x => x.v.Company == partnerName) 
+                .OrderByDescending(x => x.b.TravelDate)
                 .ToListAsync();
 
             var individualReports = data.Select(x => {
-                var distance = x.b.DistanceKm;
-                var mileage = (decimal)x.v.Mileage;
-                var calculatedFuelCost = mileage > 0 ? (distance / mileage) * dieselPrice : 0;
-                var actualExpenses = x.b.Expenses.Sum(e => e.Amount);
-                var totalCost = actualExpenses + calculatedFuelCost;
+                var fuelCost = x.b.FuelLogs.Sum(f => f.TotalCost);
+                var otherExpenses = x.b.Expenses.Sum(e => e.Amount);
+                
+                // If no fuel logs, fallback to estimate (Optional fallback)
+                if (fuelCost == 0 && x.b.DistanceKm > 0 && x.v.Mileage > 0)
+                {
+                    // Default diesel price fallback if not in logs
+                     fuelCost = (decimal)((x.b.DistanceKm / x.v.Mileage) * 95.0); 
+                }
+
+                var totalTripCost = fuelCost + otherExpenses + x.b.DriverBatta + x.b.TollCost + x.b.PermitCost + x.b.OtherExpenses;
+                var netProfit = x.b.TotalAmount - totalTripCost;
 
                 return new {
                     BookingId = x.b.Id,
                     Date = x.b.TravelDate,
+                    Vehicle = x.v.Name,
+                    Number = x.v.Number,
                     Customer = x.b.CustomerName,
                     Status = x.b.Status,
-                    Days = x.b.NumDays,
-                    Places = x.b.Places,
-                    DistanceKm = distance,
+                    DistanceKm = x.b.DistanceKm,
                     Revenue = x.b.TotalAmount,
-                    CalculatedFuelCost = Math.Round(calculatedFuelCost, 2),
-                    ActualExpenses = actualExpenses,
-                    NetProfit = x.b.TotalAmount - totalCost
+                    FuelCost = Math.Round(fuelCost, 2),
+                    OtherExpenses = otherExpenses + x.b.DriverBatta + x.b.TollCost + x.b.PermitCost + x.b.OtherExpenses,
+                    NetProfit = Math.Round(netProfit, 2),
+                    IsFuelEstimated = !x.b.FuelLogs.Any()
                 };
             });
 
             return Ok(new {
                 TotalRevenue = individualReports.Sum(r => r.Revenue),
-                TotalExpenses = individualReports.Sum(r => r.ActualExpenses),
-                TotalCalculatedFuelCost = individualReports.Sum(r => r.CalculatedFuelCost),
+                TotalExpenses = individualReports.Sum(r => r.OtherExpenses) + individualReports.Sum(r => r.FuelCost),
+                TotalFuelCost = individualReports.Sum(r => r.FuelCost),
                 TotalNetProfit = individualReports.Sum(r => r.NetProfit),
                 Trips = individualReports
             });
