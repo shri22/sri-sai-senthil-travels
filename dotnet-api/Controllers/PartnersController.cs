@@ -58,18 +58,26 @@ namespace S3T.Api.Controllers
         public async Task<ActionResult<IEnumerable<Booking>>> GetMyBookings()
         {
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? partnerId = null;
+            if (int.TryParse(userIdString, out int pid)) partnerId = pid;
             
-            // Technically: This is a 'Join' query. We look for bookings where 
-            // the associated Vehicle belongs to this Partner.
+            // Fetch bookings that match EITHER:
+            // 1. The vehicle belongs to this partner
+            // 2. The booking was manually created by this partner (even if no vehicle assigned yet)
             var bookings = await _context.Bookings
                 .Include(b => b.Payments)
                 .Include(b => b.FuelLogs)
                 .Include(b => b.Expenses)
-                .Join(_context.Vehicles, 
+                .GroupJoin(_context.Vehicles, 
                     b => b.VehicleId, 
                     v => v.Id, 
-                    (b, v) => new { b, v })
-                .Where(x => x.v.Company == partnerName && !x.v.IsDeleted)
+                    (b, vehicles) => new { b, vehicles })
+                .SelectMany(x => x.vehicles.DefaultIfEmpty(), (x, v) => new { x.b, v })
+                .Where(x => 
+                    (x.v != null && x.v.Company == partnerName && !x.v.IsDeleted) || 
+                    (partnerId.HasValue && x.b.PartnerId == partnerId.Value)
+                )
                 .Select(x => x.b)
                 .ToListAsync();
 
@@ -114,16 +122,27 @@ namespace S3T.Api.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
         [HttpPost("manual-booking")]
         public async Task<ActionResult<Booking>> CreateManualBooking(Booking booking)
         {
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
-            // Verify vehicle ownership
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-            if (vehicle == null || vehicle.Company != partnerName)
-                return Unauthorized(new { error = "You do not own this vehicle." });
+            // Set the PartnerId so we know who created this booking
+            if (int.TryParse(userIdString, out int pid)) 
+            {
+                booking.PartnerId = pid;
+            }
+
+            // Verify vehicle ownership ONLY if vehicle is assigned
+            if (booking.VehicleId.HasValue)
+            {
+                var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+                if (vehicle == null || vehicle.Company != partnerName)
+                    return Unauthorized(new { error = "You do not own this vehicle." });
+            }
 
             booking.Status = "Confirmed"; // Manual entry is typically confirmed immediately
             booking.CreatedAt = DateTime.UtcNow;
