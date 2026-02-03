@@ -182,7 +182,12 @@ namespace S3T.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message, stack = ex.StackTrace });
+                var message = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    message = ex.InnerException.Message; // Get the actual SQL error
+                }
+                return StatusCode(500, new { error = message, stack = ex.StackTrace });
             }
         }
 
