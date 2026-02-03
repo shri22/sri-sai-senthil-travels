@@ -796,7 +796,7 @@ export default function DashboardPage() {
                                     window.location.reload();
                                 } else {
                                     const err = await res.text();
-                                    alert("Submission Failed: " + err);
+                                    alert("Sub v4 Failed: " + err);
                                 }
                             }} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
@@ -974,173 +974,180 @@ export default function DashboardPage() {
                             </form>
                         </div>
                     </div>
-                )}
+                )
+                }
 
-                {showPaymentForm && selectedBooking && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
-                        <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-2xl font-serif font-bold text-white italic">Record Payment</h3>
-                                    <p className="text-[10px] text-green-500 font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
+                {
+                    showPaymentForm && selectedBooking && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
+                            <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-2xl font-serif font-bold text-white italic">Record Payment</h3>
+                                        <p className="text-[10px] text-green-500 font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
+                                    </div>
+                                    <button onClick={() => setShowPaymentForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
                                 </div>
-                                <button onClick={() => setShowPaymentForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
+                                <form onSubmit={handleAddPayment} className="space-y-6">
+                                    {selectedBooking.payments && selectedBooking.payments.length > 0 && (
+                                        <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-3">
+                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest border-b border-white/10 pb-2">Previous Advances</p>
+                                            <div className="max-h-32 overflow-y-auto space-y-2 pr-2">
+                                                {selectedBooking.payments.map((p: any, idx: number) => (
+                                                    <div key={idx} className="flex justify-between items-center text-[10px]">
+                                                        <span className="text-white/60">{new Date(p.paymentDate).toLocaleDateString()}</span>
+                                                        <span className="text-white font-bold">₹{p.amount.toLocaleString()} ({p.paymentMode})</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Amount Received (₹)</label>
+                                        <input name="amount" type="number" required className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="5000" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Payment Mode</label>
+                                        <select name="paymentMode" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer">
+                                            <option value="Cash" className="bg-bg-dark">Cash</option>
+                                            <option value="Online" className="bg-bg-dark">Online Transfer</option>
+                                            <option value="Check" className="bg-bg-dark">Check / DD</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Notes / Reference ID</label>
+                                        <textarea name="notes" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none h-24" placeholder="UPI Ref: 1234567890" />
+                                    </div>
+                                    <button type="submit" className="w-full py-5 bg-green-500 text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-green-500/20">Confirm Payment</button>
+                                </form>
                             </div>
-                            <form onSubmit={handleAddPayment} className="space-y-6">
-                                {selectedBooking.payments && selectedBooking.payments.length > 0 && (
-                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-3">
-                                        <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest border-b border-white/10 pb-2">Previous Advances</p>
-                                        <div className="max-h-32 overflow-y-auto space-y-2 pr-2">
-                                            {selectedBooking.payments.map((p: any, idx: number) => (
-                                                <div key={idx} className="flex justify-between items-center text-[10px]">
-                                                    <span className="text-white/60">{new Date(p.paymentDate).toLocaleDateString()}</span>
-                                                    <span className="text-white font-bold">₹{p.amount.toLocaleString()} ({p.paymentMode})</span>
-                                                </div>
-                                            ))}
+                        </div>
+                    )
+                }
+
+                {
+                    showExpenseForm && selectedBooking && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
+                            <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-2xl font-serif font-bold text-white italic">Record Operation Cost</h3>
+                                        <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
+                                    </div>
+                                    <button onClick={() => setShowExpenseForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
+                                </div>
+                                <form onSubmit={handleAddExpenseOrFuel} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Expense Category</label>
+                                        <select
+                                            name="type"
+                                            id="expenseType"
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                const fuelInputs = document.getElementById('fuelInputs');
+                                                const regularInputs = document.getElementById('regularInputs');
+                                                if (val === 'Fuel') {
+                                                    if (fuelInputs) fuelInputs.style.display = 'block';
+                                                    if (regularInputs) regularInputs.style.display = 'none';
+                                                } else {
+                                                    if (fuelInputs) fuelInputs.style.display = 'none';
+                                                    if (regularInputs) regularInputs.style.display = 'block';
+                                                }
+                                            }}
+                                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer"
+                                        >
+                                            <option value="Fuel" className="bg-bg-dark">Heritage Diesel (Detailed Log)</option>
+                                            <option value="Toll" className="bg-bg-dark">Toll / Fastag</option>
+                                            <option value="Permit" className="bg-bg-dark">State Permit</option>
+                                            <option value="Bata" className="bg-bg-dark">Driver Bata</option>
+                                            <option value="Maintenance" className="bg-bg-dark">Miscellaneous</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Fuel Inputs */}
+                                    <div id="fuelInputs" className="space-y-4 animate-fade-in">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Liters</label>
+                                                <input name="liters" type="number" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="50.5" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Cost / Liter</label>
+                                                <input name="costPerLiter" type="number" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="95.40" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Odometer Reading</label>
+                                            <input name="odometer" type="number" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10500" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Station / Location</label>
+                                            <input name="description" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Shell Station, Madurai Bypass" />
                                         </div>
                                     </div>
-                                )}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Amount Received (₹)</label>
-                                    <input name="amount" type="number" required className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="5000" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Payment Mode</label>
-                                    <select name="paymentMode" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer">
-                                        <option value="Cash" className="bg-bg-dark">Cash</option>
-                                        <option value="Online" className="bg-bg-dark">Online Transfer</option>
-                                        <option value="Check" className="bg-bg-dark">Check / DD</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Notes / Reference ID</label>
-                                    <textarea name="notes" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none h-24" placeholder="UPI Ref: 1234567890" />
-                                </div>
-                                <button type="submit" className="w-full py-5 bg-green-500 text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-green-500/20">Confirm Payment</button>
-                            </form>
-                        </div>
-                    </div>
-                )}
 
-                {showExpenseForm && selectedBooking && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
-                        <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-2xl font-serif font-bold text-white italic">Record Operation Cost</h3>
-                                    <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
-                                </div>
-                                <button onClick={() => setShowExpenseForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
+                                    {/* Regular Inputs */}
+                                    <div id="regularInputs" className="space-y-4 hidden">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Amount (₹)</label>
+                                            <input name="amount" type="number" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="2500" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Description</label>
+                                            <textarea name="description" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none h-24" placeholder="Brief details about the expense..." />
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" className="w-full py-5 bg-primary text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-primary/20">Authorize Expense</button>
+                                </form>
                             </div>
-                            <form onSubmit={handleAddExpenseOrFuel} className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Expense Category</label>
-                                    <select
-                                        name="type"
-                                        id="expenseType"
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            const fuelInputs = document.getElementById('fuelInputs');
-                                            const regularInputs = document.getElementById('regularInputs');
-                                            if (val === 'Fuel') {
-                                                if (fuelInputs) fuelInputs.style.display = 'block';
-                                                if (regularInputs) regularInputs.style.display = 'none';
-                                            } else {
-                                                if (fuelInputs) fuelInputs.style.display = 'none';
-                                                if (regularInputs) regularInputs.style.display = 'block';
-                                            }
-                                        }}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer"
-                                    >
-                                        <option value="Fuel" className="bg-bg-dark">Heritage Diesel (Detailed Log)</option>
-                                        <option value="Toll" className="bg-bg-dark">Toll / Fastag</option>
-                                        <option value="Permit" className="bg-bg-dark">State Permit</option>
-                                        <option value="Bata" className="bg-bg-dark">Driver Bata</option>
-                                        <option value="Maintenance" className="bg-bg-dark">Miscellaneous</option>
-                                    </select>
+                        </div>
+                    )
+                }
+                {
+                    showCloseTripForm && selectedBooking && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
+                            <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-2xl font-serif font-bold text-white italic">Heritage Trip Completion</h3>
+                                        <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
+                                    </div>
+                                    <button onClick={() => setShowCloseTripForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
                                 </div>
-
-                                {/* Fuel Inputs */}
-                                <div id="fuelInputs" className="space-y-4 animate-fade-in">
+                                <form onSubmit={handleCloseTrip} className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Liters</label>
-                                            <input name="liters" type="number" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="50.5" />
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Start Odometer (KM)</label>
+                                            <input name="startKms" type="number" required defaultValue={selectedBooking.startKms || 0} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10200" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Cost / Liter</label>
-                                            <input name="costPerLiter" type="number" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="95.40" />
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">End Odometer (KM)</label>
+                                            <input name="endKms" type="number" required className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10500" />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Odometer Reading</label>
-                                        <input name="odometer" type="number" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10500" />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Start Time</label>
+                                            <input name="startTime" type="datetime-local" required defaultValue={new Date(selectedBooking.travelDate).toISOString().slice(0, 16)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">End Time</label>
+                                            <input name="endTime" type="datetime-local" required defaultValue={new Date().toISOString().slice(0, 16)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none" />
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Station / Location</label>
-                                        <input name="description" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Shell Station, Madurai Bypass" />
+                                    <div className="p-6 bg-primary/10 rounded-2xl border border-primary/20">
+                                        <p className="text-[9px] text-primary font-bold uppercase tracking-widest leading-relaxed">
+                                            Closing this trip will mark it as 'Completed' and fix the total distance for mileage calculations. Ensure all diesel logs and expenses are recorded before closing.
+                                        </p>
                                     </div>
-                                </div>
-
-                                {/* Regular Inputs */}
-                                <div id="regularInputs" className="space-y-4 hidden">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Amount (₹)</label>
-                                        <input name="amount" type="number" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="2500" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Description</label>
-                                        <textarea name="description" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none h-24" placeholder="Brief details about the expense..." />
-                                    </div>
-                                </div>
-
-                                <button type="submit" className="w-full py-5 bg-primary text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-primary/20">Authorize Expense</button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-                {showCloseTripForm && selectedBooking && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
-                        <div className="glass-dark w-full max-w-lg p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="text-2xl font-serif font-bold text-white italic">Heritage Trip Completion</h3>
-                                    <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1">Booking #{selectedBooking.id}</p>
-                                </div>
-                                <button onClick={() => setShowCloseTripForm(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
+                                    <button type="submit" className="w-full py-5 bg-primary text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-primary/20">Finalize & Close Trip</button>
+                                </form>
                             </div>
-                            <form onSubmit={handleCloseTrip} className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Start Odometer (KM)</label>
-                                        <input name="startKms" type="number" required defaultValue={selectedBooking.startKms || 0} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10200" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">End Odometer (KM)</label>
-                                        <input name="endKms" type="number" required className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="10500" />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Start Time</label>
-                                        <input name="startTime" type="datetime-local" required defaultValue={new Date(selectedBooking.travelDate).toISOString().slice(0, 16)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">End Time</label>
-                                        <input name="endTime" type="datetime-local" required defaultValue={new Date().toISOString().slice(0, 16)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none" />
-                                    </div>
-                                </div>
-                                <div className="p-6 bg-primary/10 rounded-2xl border border-primary/20">
-                                    <p className="text-[9px] text-primary font-bold uppercase tracking-widest leading-relaxed">
-                                        Closing this trip will mark it as 'Completed' and fix the total distance for mileage calculations. Ensure all diesel logs and expenses are recorded before closing.
-                                    </p>
-                                </div>
-                                <button type="submit" className="w-full py-5 bg-primary text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-primary/20">Finalize & Close Trip</button>
-                            </form>
                         </div>
-                    </div>
-                )}
-            </main>
-        </div>
+                    )
+                }
+            </main >
+        </div >
     );
 }

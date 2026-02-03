@@ -136,15 +136,18 @@ namespace S3T.Api.Controllers
                 booking.PartnerId = pid;
             }
 
+            var isAdmin = User.IsInRole("Admin");
+            
             // Verify vehicle ownership OR allow booking if it's from current selection
-            if (booking.VehicleId.HasValue)
+            if (booking.VehicleId.HasValue && !isAdmin)
             {
                 var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
                 // Allow if: vehicle belongs to partner OR it belongs to 'Sri Sai Senthil Travels' (main fleet)
                 if (vehicle == null || (vehicle.Company != partnerName && vehicle.Company != "Sri Sai Senthil Travels"))
                 {
-                    // Secondary check: Did the user manually select this? The fleet returned to them was already filtered.
-                    // We allow it to support cross-partner booking if needed, but primarily we check PartnerId now.
+                    // If it's another partner's vehicle and we aren't admin, we might still allow it 
+                    // if it's in our allowed list, but for now we trust the UI's filtered list.
+                    // We only block if the metadata is clearly broken.
                     if (vehicle != null && string.IsNullOrEmpty(vehicle.Company))
                          return Unauthorized(new { error = "Vehicle metadata error." });
                 }
