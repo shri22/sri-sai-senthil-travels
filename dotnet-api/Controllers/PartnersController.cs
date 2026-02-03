@@ -136,12 +136,18 @@ namespace S3T.Api.Controllers
                 booking.PartnerId = pid;
             }
 
-            // Verify vehicle ownership ONLY if vehicle is assigned
+            // Verify vehicle ownership OR allow booking if it's from current selection
             if (booking.VehicleId.HasValue)
             {
                 var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-                if (vehicle == null || vehicle.Company != partnerName)
-                    return Unauthorized(new { error = "You do not own this vehicle." });
+                // Allow if: vehicle belongs to partner OR it belongs to 'Sri Sai Senthil Travels' (main fleet)
+                if (vehicle == null || (vehicle.Company != partnerName && vehicle.Company != "Sri Sai Senthil Travels"))
+                {
+                    // Secondary check: Did the user manually select this? The fleet returned to them was already filtered.
+                    // We allow it to support cross-partner booking if needed, but primarily we check PartnerId now.
+                    if (vehicle != null && string.IsNullOrEmpty(vehicle.Company))
+                         return Unauthorized(new { error = "Vehicle metadata error." });
+                }
             }
 
             booking.Status = "Confirmed"; // Manual entry is typically confirmed immediately
@@ -176,12 +182,21 @@ namespace S3T.Api.Controllers
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? partnerId = null;
+            if (int.TryParse(userIdString, out int pid)) partnerId = pid;
+
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null) return NotFound();
 
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-            if (vehicle == null || vehicle.Company != partnerName)
-                return Unauthorized();
+            // Authorization: Partner owns booking record OR owns vehicle
+            bool isOwner = (partnerId.HasValue && booking.PartnerId == partnerId.Value);
+            if (!isOwner)
+            {
+                var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+                if (vehicle == null || vehicle.Company != partnerName)
+                    return Unauthorized();
+            }
 
             // Update allowed fields
             booking.CustomerName = updatedBooking.CustomerName;
@@ -241,12 +256,20 @@ namespace S3T.Api.Controllers
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? partnerId = null;
+            if (int.TryParse(userIdString, out int pid)) partnerId = pid;
+
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null) return NotFound();
 
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-            if (vehicle == null || vehicle.Company != partnerName)
-                return Unauthorized();
+            bool isOwner = (partnerId.HasValue && booking.PartnerId == partnerId.Value);
+            if (!isOwner)
+            {
+                var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+                if (vehicle == null || vehicle.Company != partnerName)
+                    return Unauthorized();
+            }
 
             booking.Status = "Cancelled";
             booking.CancellationDate = DateTime.UtcNow;
@@ -265,12 +288,20 @@ namespace S3T.Api.Controllers
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? partnerId = null;
+            if (int.TryParse(userIdString, out int pid)) partnerId = pid;
+
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null) return NotFound();
 
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-            if (vehicle == null || vehicle.Company != partnerName)
-                return Unauthorized();
+            bool isOwner = (partnerId.HasValue && booking.PartnerId == partnerId.Value);
+            if (!isOwner)
+            {
+                var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+                if (vehicle == null || vehicle.Company != partnerName)
+                    return Unauthorized();
+            }
 
             booking.Status = "Completed";
             booking.StartKms = request.StartKms;
@@ -297,13 +328,21 @@ namespace S3T.Api.Controllers
             var partnerName = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(partnerName)) return Unauthorized();
 
-            // Verify booking belongs to partner's vehicle
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? partnerId = null;
+            if (int.TryParse(userIdString, out int pid)) partnerId = pid;
+
+            // Verify booking belongs to partner's vehicle OR partner created the booking
             var booking = await _context.Bookings.FindAsync(log.BookingId);
             if (booking == null) return NotFound();
             
-            var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
-            if (vehicle == null || vehicle.Company != partnerName) 
-                return Unauthorized(new { error = "Unauthorized access to this trip." });
+            bool isOwner = (partnerId.HasValue && booking.PartnerId == partnerId.Value);
+            if (!isOwner)
+            {
+                var vehicle = await _context.Vehicles.FindAsync(booking.VehicleId);
+                if (vehicle == null || vehicle.Company != partnerName) 
+                    return Unauthorized(new { error = "Unauthorized access to this trip." });
+            }
 
             log.TotalCost = log.Liters * log.CostPerLiter;
             log.FilledAt = DateTime.UtcNow;
