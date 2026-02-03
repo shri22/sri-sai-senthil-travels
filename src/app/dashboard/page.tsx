@@ -795,8 +795,13 @@ export default function DashboardPage() {
                                     setShowManualBookingForm(false);
                                     window.location.reload();
                                 } else {
-                                    const err = await res.text();
-                                    alert("Sub v4 Failed: " + err);
+                                    const errText = await res.text();
+                                    let errMsg = errText;
+                                    try {
+                                        const errJson = JSON.parse(errText);
+                                        errMsg = errJson.error || errJson.message || errText;
+                                    } catch(e) {}
+                                    alert("Sub v5 Failed: " + errMsg);
                                 }
                             }} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 

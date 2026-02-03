@@ -153,30 +153,37 @@ namespace S3T.Api.Controllers
                 }
             }
 
-            booking.Status = "Confirmed"; // Manual entry is typically confirmed immediately
-            booking.CreatedAt = DateTime.UtcNow;
-            
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync(); // Save to get the ID
-
-            // Block dates for the range only if vehicle is assigned
-            if (booking.VehicleId.HasValue)
+            try
             {
-                var start = booking.TravelDate.Date;
-                var end = booking.EndDate?.Date ?? start;
-                for (var d = start; d <= end; d = d.AddDays(1))
+                booking.Status = "Confirmed"; // Manual entry is typically confirmed immediately
+                booking.CreatedAt = DateTime.UtcNow;
+                
+                _context.Bookings.Add(booking);
+                await _context.SaveChangesAsync(); // Save to get the ID
+
+                // Block dates only if vehicle is assigned
+                if (booking.VehicleId.HasValue)
                 {
-                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                        VehicleId = booking.VehicleId.Value,
-                        BlockedDate = d,
-                        Reason = "Manual Reservation",
-                        BookingId = booking.Id
-                    });
+                    var start = booking.TravelDate.Date;
+                    var end = booking.EndDate?.Date ?? start;
+                    for (var d = start; d <= end; d = d.AddDays(1))
+                    {
+                        _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                            VehicleId = booking.VehicleId.Value,
+                            BlockedDate = d,
+                            Reason = "Partner Manual Entry",
+                            BookingId = booking.Id
+                        });
+                    }
                 }
+                await _context.SaveChangesAsync();
+                Response.Headers.Append("X-Code-Version", "v5-debug");
+                return Ok(booking);
             }
-            
-            await _context.SaveChangesAsync();
-            return Ok(booking);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message, stack = ex.StackTrace });
+            }
         }
 
         [HttpPut("bookings/{id}")]
