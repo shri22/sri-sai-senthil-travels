@@ -136,6 +136,12 @@ namespace S3T.Api.Controllers
                 booking.PartnerId = pid;
             }
 
+            // Handle 'Assign Later' or invalid IDs from UI
+            if (booking.VehicleId.HasValue && booking.VehicleId.Value <= 0)
+            {
+                booking.VehicleId = null;
+            }
+
             var isAdmin = User.IsInRole("Admin");
             
             // Verify vehicle ownership OR allow booking if it's from current selection
@@ -161,19 +167,23 @@ namespace S3T.Api.Controllers
                 _context.Bookings.Add(booking);
                 await _context.SaveChangesAsync(); // Save to get the ID
 
-                // Block dates only if vehicle is assigned
-                if (booking.VehicleId.HasValue)
+                // Block dates only if vehicle is assigned and valid
+                if (booking.VehicleId.HasValue && booking.VehicleId.Value > 0)
                 {
-                    var start = booking.TravelDate.Date;
-                    var end = booking.EndDate?.Date ?? start;
-                    for (var d = start; d <= end; d = d.AddDays(1))
+                    var vehicleExists = await _context.Vehicles.AnyAsync(v => v.Id == booking.VehicleId.Value);
+                    if (vehicleExists)
                     {
-                        _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                            VehicleId = booking.VehicleId.Value,
-                            BlockedDate = d,
-                            Reason = "Partner Manual Entry",
-                            BookingId = booking.Id
-                        });
+                        var start = booking.TravelDate.Date;
+                        var end = booking.EndDate?.Date ?? start;
+                        for (var d = start; d <= end; d = d.AddDays(1))
+                        {
+                            _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                                VehicleId = booking.VehicleId.Value,
+                                BlockedDate = d,
+                                Reason = "Partner Manual Entry",
+                                BookingId = booking.Id
+                            });
+                        }
                     }
                 }
                 await _context.SaveChangesAsync();

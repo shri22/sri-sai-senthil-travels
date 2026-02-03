@@ -88,26 +88,35 @@ namespace S3T.Api.Controllers
         [HttpPost("manual-booking")]
         public async Task<ActionResult<Booking>> CreateManualBooking(Booking booking)
         {
-            // Admin can book for ANY vehicle (global management)
+            // Handle 'Assign Later' or invalid IDs from UI
+            if (booking.VehicleId.HasValue && booking.VehicleId.Value <= 0)
+            {
+                booking.VehicleId = null;
+            }
+
             booking.Status = "Confirmed";
             booking.CreatedAt = DateTime.UtcNow;
             
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            // Block dates only if vehicle is assigned
-            if (booking.VehicleId.HasValue)
+            // Block dates only if vehicle is assigned and valid
+            if (booking.VehicleId.HasValue && booking.VehicleId.Value > 0)
             {
-                var start = booking.TravelDate.Date;
-                var end = booking.EndDate?.Date ?? start;
-                for (var d = start; d <= end; d = d.AddDays(1))
+                var vehicleExists = await _context.Vehicles.AnyAsync(v => v.Id == booking.VehicleId.Value);
+                if (vehicleExists)
                 {
-                    _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
-                        VehicleId = booking.VehicleId.Value,
-                        BlockedDate = d,
-                        Reason = "Admin Manual Entry",
-                        BookingId = booking.Id
-                    });
+                    var start = booking.TravelDate.Date;
+                    var end = booking.EndDate?.Date ?? start;
+                    for (var d = start; d <= end; d = d.AddDays(1))
+                    {
+                        _context.VehicleBlockedDates.Add(new VehicleBlockedDate {
+                            VehicleId = booking.VehicleId.Value,
+                            BlockedDate = d,
+                            Reason = "Admin Manual Entry",
+                            BookingId = booking.Id
+                        });
+                    }
                 }
             }
             await _context.SaveChangesAsync();
