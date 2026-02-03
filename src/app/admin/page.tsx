@@ -28,8 +28,57 @@ export default function AdminDashboard() {
     const [manualDates, setManualDates] = useState({ start: '', end: '' });
     const [availableIds, setAvailableIds] = useState<number[] | null>(null);
     const [filterPartner, setFilterPartner] = useState<string>('All');
-
     const API_URL = (typeof window !== 'undefined' && window.location.hostname !== 'localhost') ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api');
+
+    const [pricingFields, setPricingFields] = useState({
+        baseRent: 0,
+        mountainRent: 0,
+        driverBatta: 0,
+        permitCost: 0,
+        tollCost: 0,
+        otherExpenses: 0,
+        discount: 0
+    });
+
+    useEffect(() => {
+        if (editingBooking) {
+            setPricingFields({
+                baseRent: editingBooking.baseRentAmount || 0,
+                mountainRent: editingBooking.mountainRent || 0,
+                driverBatta: editingBooking.driverBatta || 0,
+                permitCost: editingBooking.permitCost || 0,
+                tollCost: editingBooking.tollCost || 0,
+                otherExpenses: editingBooking.otherExpenses || 0,
+                discount: editingBooking.discountAmount || 0
+            });
+            setManualDates({
+                start: editingBooking.travelDate ? new Date(editingBooking.travelDate).toISOString().split('T')[0] : '',
+                end: editingBooking.endDate ? new Date(editingBooking.endDate).toISOString().split('T')[0] : ''
+            });
+        } else {
+            setPricingFields({
+                baseRent: 0,
+                mountainRent: 0,
+                driverBatta: 0,
+                permitCost: 0,
+                tollCost: 0,
+                otherExpenses: 0,
+                discount: 0
+            });
+            setManualDates({ start: '', end: '' });
+        }
+    }, [editingBooking]);
+
+    const calculateTotal = () => {
+        const { baseRent, mountainRent, driverBatta, permitCost, tollCost, otherExpenses, discount } = pricingFields;
+        return (Number(baseRent) || 0) + (Number(mountainRent) || 0) + (Number(driverBatta) || 0) +
+            (Number(permitCost) || 0) + (Number(tollCost) || 0) + (Number(otherExpenses) || 0) - (Number(discount) || 0);
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPricingFields(prev => ({ ...prev, [name]: Number(value) }));
+    };
 
     const handlePrintAgreement = (booking: any) => {
         window.open(`${API_URL}/bookings/${booking.id}/agreement`, '_blank');
@@ -615,124 +664,226 @@ export default function AdminDashboard() {
                 )}
 
                 {showManualBookingForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
-                        <div className="glass-dark w-full max-w-2xl p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in max-h-[90vh] overflow-y-auto">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-2xl font-serif font-bold text-white italic capitalize">{editingBooking ? 'Edit Heritage Entry' : 'Manual Heritage Entry'}</h3>
-                                <button onClick={() => { setShowManualBookingForm(false); setEditingBooking(null); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white transition-all">✕</button>
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl">
+                        <div className="glass-dark w-full max-w-4xl p-10 rounded-[40px] border border-white/10 space-y-8 animate-scale-in max-h-[95vh] overflow-y-auto">
+                            <div className="flex justify-between items-center border-b border-white/5 pb-6">
+                                <div>
+                                    <h3 className="text-3xl font-serif font-bold text-white italic">
+                                        {editingBooking ? `Edit Journey #${editingBooking.id}` : 'Admin Heritage Entry'}
+                                    </h3>
+                                    <p className="text-[10px] text-primary/60 font-bold uppercase tracking-[0.2em] mt-1">Direct Command Protocol</p>
+                                </div>
+                                <button onClick={() => { setShowManualBookingForm(false); setEditingBooking(null); }} className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all text-xl">✕</button>
                             </div>
+
                             <form onSubmit={async (e) => {
                                 e.preventDefault();
                                 const f = new FormData(e.target as HTMLFormElement);
                                 const token = localStorage.getItem('token');
+                                const total = calculateTotal();
                                 const url = editingBooking ? `${API_URL}/admin/bookings/${editingBooking.id}` : `${API_URL}/admin/manual-booking`;
-                                const method = editingBooking ? 'PUT' : 'POST';
 
                                 const res = await fetch(url, {
-                                    method: method,
+                                    method: editingBooking ? 'PUT' : 'POST',
                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                                     body: JSON.stringify({
-                                        id: editingBooking?.id,
-                                        vehicleId: Number(f.get('vehicleId')),
+                                        vehicleId: Number(f.get('vehicleId') || 0),
                                         customerName: f.get('customerName'),
                                         customerPhone: f.get('customerPhone'),
                                         pickupFrom: f.get('from'),
                                         destinationTo: f.get('to'),
                                         places: f.get('places'),
                                         travelDate: f.get('startDate'),
-                                        endDate: f.get('endDate'),
+                                        endDate: f.get('endDate') || f.get('startDate'),
                                         numDays: Number(f.get('numDays')),
-                                        totalAmount: Number(f.get('amount')),
-                                        advancePaid: Number(f.get('advance')),
-                                        paymentMethod: f.get('paymentMethod'),
-                                        balanceStatus: f.get('balanceStatus'),
+                                        totalAmount: total,
+                                        baseRentAmount: pricingFields.baseRent,
+                                        mountainRent: pricingFields.mountainRent,
+                                        driverBatta: pricingFields.driverBatta,
+                                        permitCost: pricingFields.permitCost,
+                                        tollCost: pricingFields.tollCost,
+                                        otherExpenses: pricingFields.otherExpenses,
+                                        discountAmount: pricingFields.discount,
+                                        advancePaid: Number(f.get('advance') || 0),
+                                        paymentMethod: f.get('paymentMethod') || "Cash",
+                                        balanceStatus: f.get('balanceStatus') || "Pending",
                                         inclusions: Array.from(f.getAll('inclusions')).join(', ')
                                     })
                                 });
                                 if (res.ok) {
                                     setShowManualBookingForm(false);
                                     window.location.reload();
+                                } else {
+                                    const err = await res.text();
+                                    alert("Admin Override Failed: " + err);
                                 }
-                            }} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="space-y-2 sm:col-span-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Select Vehicle (Optional)</label>
-                                    <select name="vehicleId" defaultValue={editingBooking?.vehicleId} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none appearance-none cursor-pointer">
-                                        <option value="" className="bg-bg-dark">-- Assign Later --</option>
-                                        {fleet.map(v => (
-                                            <option key={v.id} value={v.id} className="bg-bg-dark">
-                                                {v.name} ({v.number}) - {v.company}
-                                            </option>
-                                        ))}
-                                    </select>
+                            }} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+                                {/* LEFT COLUMN: GUEST & ROUTE */}
+                                <div className="space-y-8">
+                                    <section className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-6">
+                                        <div className="flex items-center gap-3 text-primary">
+                                            <span className="text-xl">👤</span>
+                                            <h4 className="text-[10px] font-bold uppercase tracking-widest">Client Identification</h4>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Lead Name</label>
+                                                <input name="customerName" required defaultValue={editingBooking?.customerName || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary focus:bg-white/10 outline-none transition-all" placeholder="Aditya Roy" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Phone Link</label>
+                                                <input name="customerPhone" required defaultValue={editingBooking?.customerPhone || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary focus:bg-white/10 outline-none transition-all" placeholder="+91..." />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-6">
+                                        <div className="flex items-center gap-3 text-primary">
+                                            <span className="text-xl">📍</span>
+                                            <h4 className="text-[10px] font-bold uppercase tracking-widest">Heritage Route Map</h4>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Departure</label>
+                                                <input name="from" required defaultValue={editingBooking?.pickupFrom || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Chennai" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Arrival</label>
+                                                <input name="to" required defaultValue={editingBooking?.destinationTo || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Madurai" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Start Cycle</label>
+                                                <input name="startDate" type="date" required value={manualDates.start} onChange={(e) => setManualDates({ ...manualDates, start: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">End Cycle</label>
+                                                <input name="endDate" type="date" required value={manualDates.end} onChange={(e) => setManualDates({ ...manualDates, end: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
+                                            </div>
+                                            <div className="space-y-2 sm:col-span-2">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Key Heritage Landmarks</label>
+                                                <input name="places" required defaultValue={editingBooking?.places || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Temple, Forts, Waterfalls..." />
+                                            </div>
+                                        </div>
+                                    </section>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Customer Name</label>
-                                    <input name="customerName" required defaultValue={editingBooking?.customerName} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Aditya Roy" />
+
+                                {/* RIGHT COLUMN: FINANCIALS & ASSET */}
+                                <div className="space-y-8">
+                                    <section className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-6">
+                                        <div className="flex items-center gap-3 text-primary">
+                                            <span className="text-xl">🚐</span>
+                                            <h4 className="text-[10px] font-bold uppercase tracking-widest">Resource Allocation</h4>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2 sm:col-span-1">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Fleet Assignment</label>
+                                                <select name="vehicleId" defaultValue={editingBooking?.vehicleId || ""} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[11px] font-bold uppercase outline-none cursor-pointer appearance-none">
+                                                    <option value="" className="bg-bg-dark">-- Reserve Later --</option>
+                                                    {fleet
+                                                        .filter(v => availableIds === null || availableIds.includes(v.id) || v.id === editingBooking?.vehicleId)
+                                                        .map(v => (
+                                                            <option key={v.id} value={v.id} className="bg-bg-dark">{v.name} ({v.number}) - {v.company}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                                {!manualDates.start && <p className="text-[8px] text-white/20 uppercase font-bold mt-1 italic">Enter dates first.</p>}
+                                            </div>
+                                            <div className="space-y-2 sm:col-span-1">
+                                                <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Duration (Days)</label>
+                                                <input name="numDays" type="number" required defaultValue={editingBooking?.numDays || 1} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section className="p-8 bg-primary/5 rounded-[32px] border border-primary/20 space-y-6 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">🏛️</div>
+                                        <div className="flex items-center gap-3 text-primary">
+                                            <span className="text-xl">💰</span>
+                                            <h4 className="text-[10px] font-bold uppercase tracking-widest">Financial Settlement</h4>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Core Heritage Rent</label>
+                                                <input name="baseRent" type="number" value={pricingFields.baseRent} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Terrain Surcharge</label>
+                                                <input name="mountainRent" type="number" value={pricingFields.mountainRent} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Driver Bata</label>
+                                                <input name="driverBatta" type="number" value={pricingFields.driverBatta} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Statutory Permits</label>
+                                                <input name="permitCost" type="number" value={pricingFields.permitCost} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Access Fees (Toll)</label>
+                                                <input name="tollCost" type="number" value={pricingFields.tollCost} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] text-white/30 font-bold uppercase ml-1 tracking-[0.1em]">Contingency</label>
+                                                <input name="otherExpenses" type="number" value={pricingFields.otherExpenses} onChange={handlePriceChange} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-primary outline-none font-mono" />
+                                            </div>
+                                            <div className="space-y-1 col-span-2">
+                                                <label className="text-[8px] text-red-500/50 font-bold uppercase ml-1 tracking-[0.1em]">Admin Discount (-)</label>
+                                                <input name="discount" type="number" value={pricingFields.discount} onChange={handlePriceChange} className="w-full bg-red-500/5 border border-red-500/20 rounded-xl p-3 text-red-500 text-sm focus:border-red-500 outline-none font-mono text-center font-bold" />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-6 border-t border-white/10 mt-6 bg-black/40 -mx-8 px-8 py-6 rounded-b-[32px]">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <div className="space-y-1">
+                                                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Aggregate Settlement</span>
+                                                    <p className="text-3xl text-primary font-serif font-bold italic drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">₹ {calculateTotal().toLocaleString()}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <select name="balanceStatus" defaultValue={editingBooking?.balanceStatus || "Pending"} className="bg-primary/10 border border-primary/20 text-primary text-[9px] font-bold uppercase rounded-full px-4 py-2 outline-none">
+                                                        <option value="Pending" className="bg-bg-dark">Unsettled</option>
+                                                        <option value="Cash on Tour Date" className="bg-bg-dark">Tour Date Cash</option>
+                                                        <option value="Paid" className="bg-bg-dark">Fully Settled</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {!editingBooking && (
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Advance Captured</label>
+                                                        <input name="advance" type="number" required defaultValue={0} className="w-full bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-green-500 text-sm focus:border-green-500 outline-none font-bold" />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[9px] text-white/40 font-bold uppercase ml-2">Channel</label>
+                                                        <select name="paymentMethod" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none">
+                                                            <option value="Cash">Cash Deposit</option>
+                                                            <option value="Online">Digital Transfer</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </section>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Phone Number</label>
-                                    <input name="customerPhone" required defaultValue={editingBooking?.customerPhone} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="+91 98765 43210" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Pickup From</label>
-                                    <input name="from" required defaultValue={editingBooking?.pickupFrom} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Chennai" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Destination To</label>
-                                    <input name="to" required defaultValue={editingBooking?.destinationTo} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" placeholder="Madurai" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Start Date</label>
-                                    <input name="startDate" type="date" required defaultValue={editingBooking ? new Date(editingBooking.travelDate).toISOString().split('T')[0] : ''} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">End Date</label>
-                                    <input name="endDate" type="date" required defaultValue={editingBooking?.endDate ? new Date(editingBooking.endDate).toISOString().split('T')[0] : ''} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Total Days</label>
-                                    <input name="numDays" type="number" required defaultValue={editingBooking?.numDays} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Total Amount (₹)</label>
-                                    <input name="amount" type="number" required defaultValue={editingBooking?.totalAmount} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Advance Received (₹)</label>
-                                    <input name="advance" type="number" required defaultValue={editingBooking?.advancePaid} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Payment Via</label>
-                                    <select name="paymentMethod" defaultValue={editingBooking?.paymentMethod} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer">
-                                        <option value="Cash" className="bg-bg-dark">Cash Payment</option>
-                                        <option value="Online" className="bg-bg-dark">Online Transfer</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Balance Logic</label>
-                                    <select name="balanceStatus" defaultValue={editingBooking?.balanceStatus} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-[10px] font-bold uppercase outline-none cursor-pointer">
-                                        <option value="Pending" className="bg-bg-dark">Pending / Not Set</option>
-                                        <option value="Cash on Tour Date" className="bg-bg-dark">Cash on Tour Date</option>
-                                        <option value="Paid" className="bg-bg-dark">Already Paid Fully</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2 sm:col-span-2">
-                                    <label className="text-[10px] text-primary font-bold uppercase tracking-widest leading-loose">Places to Visit</label>
-                                    <input name="places" required defaultValue={editingBooking?.places} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:border-primary outline-none" />
-                                </div>
-                                <div className="space-y-4 sm:col-span-2">
+
+                                <div className="lg:col-span-2 space-y-4 border-t border-white/5 pt-8">
                                     <label className="text-[10px] text-primary font-bold uppercase tracking-widest">Heritage Inclusions</label>
                                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                                         {['Driver', 'Fastag', 'Toll', 'Permit', 'Others'].map(inc => (
-                                            <label key={inc} className="flex items-center gap-2 cursor-pointer group">
+                                            <label key={inc} className="flex items-center gap-3 cursor-pointer group bg-white/5 p-3 rounded-2xl border border-white/5 hover:border-primary/40 transition-all">
                                                 <input type="checkbox" name="inclusions" value={inc} defaultChecked={editingBooking?.inclusions?.includes(inc)} className="hidden peer" />
-                                                <div className="w-4 h-4 rounded border border-white/20 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center text-[10px] text-black">✓</div>
-                                                <span className="text-[10px] text-white/40 group-hover:text-white transition-colors">{inc}</span>
+                                                <div className="w-5 h-5 rounded-lg border border-white/20 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center text-[10px] text-black">✓</div>
+                                                <span className="text-[10px] text-white/60 group-hover:text-white transition-colors">{inc}</span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
-                                <button type="submit" className="sm:col-span-2 py-5 bg-primary text-black rounded-2xl text-[12px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl shadow-primary/20 mt-4">{editingBooking ? 'Update Heritage Journey' : 'Record Heritage Trip'}</button>
+
+                                <button type="submit" className="lg:col-span-2 py-6 bg-primary text-black rounded-[24px] text-[14px] font-bold uppercase tracking-[0.4em] hover:bg-white transition-all shadow-2xl shadow-primary/20 mt-4 active:scale-95 duration-200">
+                                    {editingBooking ? '🏦 Authorize Update' : '📜 Seal Manual Record'}
+                                </button>
                             </form>
                         </div>
                     </div>
