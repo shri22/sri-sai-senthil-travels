@@ -10,7 +10,7 @@ namespace S3T.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Partner")]
+    [Authorize(Policy = "PartnerOrAdmin")]
     public class PartnersController : ControllerBase
     {
         private readonly AppDbContext _context;
