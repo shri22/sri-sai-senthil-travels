@@ -25,12 +25,19 @@ ssh s3t_dev@193.203.160.3 << 'EOF'
   find . -name '._*' -delete
 
   # 2. Build and Publish
-  echo "Publishing API..."
+  echo "Publishing API locally on server..."
   dotnet publish S3T.Api.csproj -c Release -o /var/www/srisaisenthiltravels/api-published
-
-  # 3. Restart via PM2
+  
+  echo "Staging for live deployment..."
+  cd /var/www/srisaisenthiltravels/api-published
+  tar -czf /var/www/srisaisenthiltravels/api_live_bundle.tar.gz .
+  
+  # 3. Deploy to /root and Restart
+  echo "Deploying to live directory (/root) via sudo tar..."
+  sudo tar -xzf /var/www/srisaisenthiltravels/api_live_bundle.tar.gz -C /root/s3t-api-published
+  
   echo "Restarting via PM2..."
-  sudo pm2 restart s3t-api || sudo pm2 start /var/www/srisaisenthiltravels/api-published/S3T.Api.dll --name s3t-api
+  sudo pm2 restart s3t-api || sudo pm2 start /root/s3t-api-published/S3T.Api --name s3t-api
 
   echo "Deployment Complete."
   sudo pm2 list
