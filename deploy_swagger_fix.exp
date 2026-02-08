@@ -1,0 +1,36 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+set ip "193.203.160.3"
+set user "s3t_dev"
+set password "Travels2026#"
+
+spawn scp ./backend/TourBooking.Api/Controllers/AgreementsController.cs $user@$ip:/home/$user/app_deploy/backend/TourBooking.Api/Controllers/
+
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect eof
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/s3t_dev/app_deploy && find . -name \"._*\" -delete\r"
+        expect "$ "
+        send "cd backend/TourBooking.Api && dotnet publish TourBooking.Api.csproj -c Release -o ./publish\r"
+        expect "$ "
+        send "pm2 restart s3t-api\r"
+        expect "$ "
+        send "exit\r"
+    }
+}
+
+expect eof

@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+
+set timeout 20
+set ip "193.203.160.3"
+set user "s3t_dev"
+set password "Travels2026#"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "cat /home/s3t_dev/.pm2/logs/s3t-api-error.log | grep -i \"SqlException\" -A 20 | tail -n 50\r"
+        expect "$ "
+        send "exit\r"
+    }
+}
+
+expect eof

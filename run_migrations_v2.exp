@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+set ip "193.203.160.3"
+set user "s3t_dev"
+set password "Travels2026#"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/s3t\_dev/app\_deploy/backend/TourBooking.Api\r"
+        expect "$ "
+        send "~/.dotnet/tools/dotnet-ef database update\r"
+        expect "$ "
+        send "exit\r"
+    }
+}
+
+expect eof

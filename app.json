@@ -22,6 +22,7 @@
       },
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
+      "package": "com.tourbooking.mobile",
       "predictiveBackGestureEnabled": false
     },
     "web": {

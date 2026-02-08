@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, Alert, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { KeyboardAvoidingScrollView } from '../components/KeyboardAvoidingScrollView';
@@ -35,6 +35,13 @@ export function LoginScreen() {
         <ScreenContainer>
             <KeyboardAvoidingScrollView>
                 <View style={styles.content}>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require('../../assets/icon.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
+                    </View>
                     <Text style={styles.title}>{t('auth.loginTitle')}</Text>
 
                     <View style={styles.form}>
@@ -95,5 +102,7 @@ const styles = StyleSheet.create({
     },
     primaryBtnText: { color: 'white', fontSize: 16, fontWeight: '700' },
     linkBtn: { padding: 12, alignItems: 'center' },
-    linkText: { color: '#4F46E5', fontWeight: '600' }
+    linkText: { color: '#4F46E5', fontWeight: '600' },
+    logoContainer: { alignItems: 'center', marginBottom: 20 },
+    logo: { width: 120, height: 120 }
 });

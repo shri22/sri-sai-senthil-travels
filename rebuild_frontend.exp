@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+
+set timeout 600
+set ip "193.203.160.3"
+set user "s3t_dev"
+set password "Travels2026#"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/s3t\_dev/app\_deploy/web\r"
+        expect "$ "
+        send "npm run build\r"
+        expect {
+            "Error" {
+                puts "Build failed"
+                exit 1
+            }
+            "$ " {
+                send "pm2 restart s3t-frontend\r"
+                expect "$ "
+                send "exit\r"
+            }
+        }
+    }
+}
+
+expect eof

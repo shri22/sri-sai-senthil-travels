@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+set ip "193.203.160.3"
+set user "s3t_dev"
+set password "Travels2026#"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "$ " {
+        send "cd /home/s3t_dev/app_deploy/backend/TourBooking.Api\r"
+        expect "$ "
+        # Use sed to comment out the Environment check for Swagger
+        send "sed -i 's/if (app.Environment.IsDevelopment())/if (true || app.Environment.IsDevelopment())/' Program.cs\r"
+        expect "$ "
+        send "dotnet publish TourBooking.Api.csproj -c Release -o ./publish\r"
+        expect "$ "
+        send "pm2 restart s3t-api\r"
+        expect "$ "
+        send "exit\r"
+    }
+}
+
+expect eof

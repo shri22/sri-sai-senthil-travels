@@ -58,6 +58,29 @@ app.UseCors("DevCors");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Apply migrations and seed data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+
+    // Seed a test partner user
+    if (!context.Users.Any(u => u.Username == "partner"))
+    {
+        context.Users.Add(new TourBooking.Api.Models.User
+        {
+            Username = "partner",
+            Email = "partner@srisaisenthiltravels.cloud",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("partner123"),
+            CompanyName = "Sri Sai Senthil Travels",
+            CompanyAddress = "123 Travel Lane, Chennai",
+            CompanyPhone = "9876543210",
+            CompanyEmail = "partner@srisaisenthiltravels.cloud"
+        });
+        context.SaveChanges();
+    }
+}
+
 app.MapControllers();
 
 app.Run();

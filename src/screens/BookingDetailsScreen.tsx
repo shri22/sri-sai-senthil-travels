@@ -224,13 +224,6 @@ export function BookingDetailsScreen({ route, navigation }: Props) {
                 label="PDF (English)"
                 icon={<Briefcase size={18} color="white" />}
                 onPress={() => {
-                  if (!user?.companyName) {
-                    Alert.alert('Missing Profile', 'Your Company Name is missing. Please go to Profile and Save it.');
-                    return;
-                  }
-                  // Debug: Remove this later
-                  // Alert.alert('Debug', `Generating for: ${user.companyName}`);
-
                   generateAndSharePdf(agreement, 'en', {
                     companyName: user?.companyName,
                     address: user?.companyAddress,
@@ -247,10 +240,6 @@ export function BookingDetailsScreen({ route, navigation }: Props) {
                 label="PDF (தமிழ்)"
                 icon={<Briefcase size={18} color="white" />}
                 onPress={() => {
-                  if (!user?.companyName) {
-                    Alert.alert('Missing Profile', 'Your Company Name is missing. Please go to Profile and Save it.');
-                    return;
-                  }
                   generateAndSharePdf(agreement, 'ta', {
                     companyName: user?.companyName,
                     address: user?.companyAddress,
@@ -328,7 +317,7 @@ function Row({ label, value, isLast, highlight }: { label: string; value: string
   );
 }
 
-function ActionButton({ label, icon, onPress, disabled, variant }: { label: string; icon: React.ReactNode; onPress: () => void; disabled?: boolean; variant: 'primary' | 'secondary' | 'danger' }) {
+function ActionButton({ label, icon, onPress, disabled, variant, style }: { label: string; icon: React.ReactNode; onPress: () => void; disabled?: boolean; variant: 'primary' | 'secondary' | 'danger'; style?: any }) {
   const getBg = () => {
     if (disabled) return '#E5E7EB';
     switch (variant) {
@@ -340,7 +329,7 @@ function ActionButton({ label, icon, onPress, disabled, variant }: { label: stri
 
   return (
     <Pressable
-      style={[styles.actionBtn, { backgroundColor: getBg() }]}
+      style={[styles.actionBtn, { backgroundColor: getBg() }, style]}
       disabled={disabled}
       onPress={onPress}
     >

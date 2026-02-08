@@ -413,6 +413,7 @@ public sealed class AgreementsController : ControllerBase
         return ToResponse(entity);
     }
 
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var entity = await _db.Agreements
